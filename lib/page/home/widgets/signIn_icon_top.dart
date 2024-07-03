@@ -12,7 +12,7 @@ class SignInIcon extends StatelessWidget{
       height: size.height*0.4,
       alignment: Alignment.center,
       child: Image.asset('asset/images/icons/icon_register.png', fit: BoxFit.cover,
-      // nguỳekasdnfldsnfkandlkfsnlkfnaknfkasndlkfnslkdfnaldsn
+    
       ),
     );
   }
