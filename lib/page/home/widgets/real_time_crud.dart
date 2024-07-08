@@ -3,6 +3,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
+import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/widgets/bottom_card.dart';
 
 
@@ -13,11 +15,18 @@ class RealTimeCrud extends StatefulWidget{
   State<RealTimeCrud> createState() => _RealTimeCrud();
   
 }final databaseReference = FirebaseDatabase.instance.ref();
+final _databaseService = DatabaseService();
+final List<Product> lstProduct=[]; 
+
 class _RealTimeCrud extends State<RealTimeCrud>{
   @override
   Widget build(BuildContext context) {
+    setState(() {
+      _databaseService.readProductData(lstProduct);
+    });
     // TODO: implement build
     return Scaffold(
+      
 backgroundColor: Colors.amber,
 appBar: AppBar(
   backgroundColor: Colors.blue,

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-class HomeCard extends StatelessWidget
+class CardProduct extends StatelessWidget
 {
-   HomeCard({super.key, required this.item});
+   CardProduct({super.key, required this.item});
   var item;
   
   @override
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10),
-                width: 150,height: 200,
+               
                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),
                 color:const Color(0xff574E6D),),
                 child: Column(
@@ -33,7 +33,7 @@ class HomeCard extends StatelessWidget
                         )
                       ],
                     )
-                );
+     );
   }
   
 }
