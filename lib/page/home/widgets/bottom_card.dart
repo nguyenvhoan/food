@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:food_market/models/category.dart';
 import 'package:food_market/models/database_service.dart';
 import 'package:food_market/models/product.dart';
-import 'package:food_market/page/home/widgets/real_time_crud.dart';
+
 
 class BottomCard extends StatefulWidget {
   
@@ -9,12 +10,14 @@ class BottomCard extends StatefulWidget {
     super.key,
     
     
-  });
+  }); 
 
   @override
   State<BottomCard> createState() => _BottomCardState();
 }
-final DatabaseService _databaseService= DatabaseService();
+List<Category> items = []; 
+ List<String> list=[];
+
 
 TextEditingController nameController= TextEditingController();
 
@@ -25,6 +28,10 @@ TextEditingController imageController= TextEditingController();
 TextEditingController categoryController= TextEditingController();
 
 class _BottomCardState extends State<BottomCard> {
+ 
+  // Khai báo items là một danh sách rỗng
+
+  
 
 // String title='';
   @override
@@ -76,18 +83,7 @@ class _BottomCardState extends State<BottomCard> {
               ),
             ),
             const SizedBox(height: 20,),
-            TextField(
-                controller: categoryController,              
-                // onChanged: (text) {
-                //   title=text;
-                // },
-                decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30) ,   
-                ),
-                labelText: 'Category'        
-              ),
-            ),
+            const DropdownMenuExample(),
             const Padding(padding: EdgeInsets.symmetric(vertical: 10)),
             SizedBox(
               width: double.infinity,
@@ -96,8 +92,9 @@ class _BottomCardState extends State<BottomCard> {
                 onPressed:() {
                   final id =DateTime.now().microsecond.toString();
                   final product = Product(id: id, name: nameController.text, category: categoryController.text, image: imageController.text, price: 20000);
-                  _databaseService.create(product);
-                  
+                  // _databaseService.create(product);
+                  // List<Product> pro= [];
+                  // _databaseService.readProductData(pro);
                   nameController.clear();
                   categoryController.clear();
                   imageController.clear();
@@ -109,6 +106,52 @@ class _BottomCardState extends State<BottomCard> {
           ],
         ),
       ),
+    );
+  }
+  
+}
+class DropdownMenuExample extends StatefulWidget {
+  const DropdownMenuExample({super.key});
+
+  @override
+  State<DropdownMenuExample> createState() => _DropdownMenuExampleState();
+}
+
+class _DropdownMenuExampleState extends State<DropdownMenuExample> {
+  final _databaseService = DatabaseService();
+  // Khai báo items là một danh sách rỗng
+  
+  @override
+  void initState() {
+    super.initState();
+    _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
+    for(int i =0; i<items.length;i++){
+      list.add(items[i].nameCate);
+    }
+  }
+
+  Future <void> _loadProductData() async {
+    await _databaseService.readCateData(items);
+    setState(() {
+      
+    });
+  }
+  
+  String dropdownValue = list.first;
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownMenu<String>(
+      initialSelection: list.first,
+      onSelected: (String? value) {
+        // This is called when the user selects an item.
+        setState(() {
+          dropdownValue = value!;
+        });
+      },
+      dropdownMenuEntries: list.map<DropdownMenuEntry<String>>((String value) {
+        return DropdownMenuEntry<String>(value: value, label: value);
+      }).toList(),
     );
   }
 }
