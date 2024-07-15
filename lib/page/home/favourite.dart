@@ -1,47 +1,38 @@
-
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:food_market/models/category.dart';
+import 'package:flutter/widgets.dart';
 import 'package:food_market/models/database_service.dart';
-import 'package:food_market/page/admin/widget/bottom_option_category.dart';
-import 'package:food_market/page/admin/widget/update_bottom_sheet.dart';
+import 'package:food_market/models/product.dart';
 
-
-
-class AdminCate extends StatefulWidget {
-  const AdminCate({super.key});
+class Favourite extends StatefulWidget {
+  var account;
+   Favourite({super.key,required this.account});
+   
 
   @override
-  State<AdminCate> createState() => _AdminCateState();
+  State<Favourite> createState() => _FavouriteState();
 }
 
-class _AdminCateState extends State<AdminCate> {
-  var color=0xffDDDDDD;
+class _FavouriteState extends State<Favourite> {
   final _databaseService = DatabaseService();
-  final databaseReference = FirebaseDatabase.instance.ref("Category");
-  List<Category> items = []; // Khai báo items là một danh sách rỗng
 
-  @override
-  void initState() {
-    super.initState();
-    // _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
-  }
+  List<Category> list=[];
 
-  // Future <void> _loadProductData() async {
-  //   await _databaseService.readCLBData(items);
-  //   setState(() {});
-  // }
+  
+
+  List<Product> items = []; 
+
   @override
   Widget build(BuildContext context) {
-    // Sử dụng items để xây dựng giao diện
+    final databaseReference = FirebaseDatabase.instance.ref("Account").child(widget.account).child('Like');
     return Scaffold(
       
       appBar: AppBar(
         backgroundColor: Color(0xff574E6D),
         centerTitle: true,
-        title:const Text('Những loại sản phẩm', style: TextStyle(
+        title:const Text('Món ăn yêu thích', style: TextStyle(
           fontSize: 30, fontWeight: FontWeight.bold,
           color: Colors.white
           
@@ -53,13 +44,8 @@ class _AdminCateState extends State<AdminCate> {
               child: FirebaseAnimatedList(
                   query: databaseReference,
                   itemBuilder: (context, snapshot, index, animation) {
-                    print(snapshot.child('img').value.toString());
-                    if(animation % 2==0){
-                        color=0xffFFF; 
-                    }
-                    else {
-                      color=0xffEEEEEE;
-                    }
+                    
+                   
                     return GestureDetector(
                       onTap: (){
                         // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateCauthu(id: snapshot.child('nameCLB').value.toString())));
@@ -69,11 +55,12 @@ class _AdminCateState extends State<AdminCate> {
                           borderRadius: BorderRadius.circular(20),
                           
                         ),
-                        color: Color(color),
+                        
                         margin: const EdgeInsets.all(10),
                         child: ListTile(
                           title: Text(
-                            snapshot.child("nameCate").value.toString(),
+                            snapshot.child("name").value.toString(),
+                            
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 20,
@@ -82,7 +69,7 @@ class _AdminCateState extends State<AdminCate> {
                           subtitle:Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(snapshot.child("des").value.toString()),
+                              Text('Giá : '+snapshot.child("price").value.toString()+'đ'),
                               // Text('Số lượng cầu thủ : ${snapshot.child('soLuong').value.toString()}'),
                       
                             ],
@@ -91,7 +78,7 @@ class _AdminCateState extends State<AdminCate> {
                           leading: CircleAvatar(
                             radius: 50,
                               child: ClipOval(
-                                child: Image.network(snapshot.child('img').value.toString(),
+                                child: Image.network(snapshot.child('image').value.toString(),
                                                             ),
                               ),
                             
@@ -106,14 +93,14 @@ class _AdminCateState extends State<AdminCate> {
                                 child: ListTile(
                                   onTap: () {
                                     // Navigator.pop(context);
-                                    showModalBottomSheet(context: context, builder: (BuildContext context){
-                                        return UpdateBottom(
-                                        name: snapshot.child('nameCate').value.toString(),
-                                        des: snapshot.child('des').value.toString(),
-                                        img: snapshot.child('img').value.toString(), 
-                                        id: snapshot.child('idCate').value.toString(),
-                                        );
-                                    });
+                                    // showModalBottomSheet(context: context, builder: (BuildContext context){
+                                    //     // return UpdateBottom(
+                                    //     // name: snapshot.child('nameCate').value.toString(),
+                                    //     // des: snapshot.child('des').value.toString(),
+                                    //     // img: snapshot.child('img').value.toString(), 
+                                    //     // id: snapshot.child('idCate').value.toString(),
+                                    //     // );
+                                    // });
                                   },
                                   leading: const Icon(Icons.edit),
                                   title: const Text("Edit"),
@@ -139,21 +126,12 @@ class _AdminCateState extends State<AdminCate> {
                     );
       
                   })),
-                  ElevatedButton(onPressed: (){
+                  ElevatedButton(onPressed: (){ 
                     // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
                   }, child: Text('Xếp bảng đấu', style: TextStyle(color: Colors.black),))
         ]
       ),
 
-      floatingActionButton: FloatingActionButton(
-  child: Icon(Icons.add),
-  onPressed: (){
-    showModalBottomSheet(context: context, builder: (BuildContext content){
-      return BottomOption();
-    });
-  }
-),
     );
   }
-
 }

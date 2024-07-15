@@ -1,29 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:food_market/page/home/cart_page.dart';
+import 'package:food_market/page/home/favourite.dart';
 import 'package:food_market/page/home/home_page.dart';
 import 'package:food_market/page/home/intro_page.dart';
 import 'package:food_market/page/home/profile_page.dart';
 
 
+
 class NavigationMenu extends StatefulWidget {
-   NavigationMenu({super.key});
+  var account;
+  
+   NavigationMenu({super.key, required this.account});
+   
 
   @override
   State<NavigationMenu> createState() => _NavigationMenuState();
 }
 
 class _NavigationMenuState extends State<NavigationMenu> {
+   late var account;
   int myCurrentindex=0;
-
-  List page = [
-    HomePage(),
-    IntroPage(),
-    Cart(),
+  List<Widget> get page => [
+    HomePage(account: account),
+    Favourite(account: account),
+    Cart(account: account,),
     ProfilePage(),
   ] ;
-
+  
+@override
+  void initState() {
+    super.initState();
+    account = widget.account;
+    print(account);
+  }
   @override
   Widget build(BuildContext context) {
+    
     return Scaffold(
       backgroundColor:  Color.fromARGB(255, 23, 20, 32),
       bottomNavigationBar: Container(

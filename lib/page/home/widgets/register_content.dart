@@ -32,7 +32,7 @@ class _RegisterContentState extends State<RegisterContent> {
 
   TextEditingController emailController = new TextEditingController();
 
-  String email="",name="",password="";
+  String email="",name="",password="", userId="";
 
   Future<void> registration(BuildContext context) async {
     try {
@@ -42,6 +42,15 @@ class _RegisterContentState extends State<RegisterContent> {
     
     
   );
+  final id =DateTime.now().microsecond.toString();
+                  databaseReference.child('Account').child(FirebaseAuth.instance.currentUser?.uid ?? '').set({
+                    'name': nameController.text.toString(),
+                    'email':emailController.text.toString(),
+                    'password':passwordController.text.toString(),
+                    'id':id,
+
+                  });
+  
       } on FirebaseAuthException catch (e) {
         if (e.code == 'weak-password') {
           print('The password provided is too weak.');
@@ -279,19 +288,12 @@ class _RegisterContentState extends State<RegisterContent> {
                     //   nameController.text="";
                     // });
                   }
-                  final id =DateTime.now().microsecond.toString();
-                  databaseReference.child('Account/$id').set({
-                    'name': nameController.text.toString(),
-                    'email':emailController.text.toString(),
-                    'password':passwordController.text.toString(),
-                    'id':id,
-
-                  });
+                  
                   await registration(context);
                   
                 
                 },
-                child: Container(
+                child: Container( 
                   alignment: Alignment.center,
                   height: size.height / 14,
                   width: size.width / 1,
