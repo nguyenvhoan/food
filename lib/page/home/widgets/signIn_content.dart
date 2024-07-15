@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -19,13 +20,19 @@ class SignInContent extends StatefulWidget{
 class _SignInContentState extends State<SignInContent> {
   bool _obscureText = true;
   final _formkey = GlobalKey<FormState>();
+  final databaseReference = FirebaseDatabase.instance;
     String email="", password="";
     TextEditingController emailController = new TextEditingController();
     TextEditingController passwordController = new TextEditingController();
     signIn()async{
       try{
+         String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
+      print('User ID: $userId');
+      
+
+
         await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavigationMenu()));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavigationMenu(account:  FirebaseAuth.instance.currentUser?.uid ?? '',)));
 
       }
       on FirebaseAuthException catch (e){

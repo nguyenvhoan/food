@@ -16,7 +16,7 @@ class BottomCard extends StatefulWidget {
   State<BottomCard> createState() => _BottomCardState();
 }
 List<Category> items = []; 
- List<String> list=[];
+ List<String> list=["1","2","3","4","5"];
 
 
 TextEditingController nameController= TextEditingController();
@@ -26,6 +26,7 @@ TextEditingController priceController= TextEditingController();
 TextEditingController imageController= TextEditingController();
 
 TextEditingController categoryController= TextEditingController();
+TextEditingController desController= TextEditingController();
 
 class _BottomCardState extends State<BottomCard> {
  
@@ -91,7 +92,7 @@ class _BottomCardState extends State<BottomCard> {
               child: ElevatedButton(
                 onPressed:() {
                   final id =DateTime.now().microsecond.toString();
-                  final product = Product(id: id, name: nameController.text, category: categoryController.text, image: imageController.text, price: 20000);
+                  final product = Product(id: id, name: nameController.text, category: categoryController.text, image: imageController.text, price: int.tryParse(priceController.text) ?? 0,des:  desController.text);
                   // _databaseService.create(product);
                   // List<Product> pro= [];
                   // _databaseService.readProductData(pro);

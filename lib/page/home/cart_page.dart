@@ -1,13 +1,23 @@
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 
-class Cart extends StatelessWidget {
-  const Cart({super.key});
+import 'package:flutter/material.dart';
+import 'package:food_market/page/home/confirm_page.dart';
+
+
+class Cart extends StatefulWidget {
+  var  account;
+   Cart({super.key, required this.account});
 
   @override
+  State<Cart> createState() => _CartState();
+}
+
+class _CartState extends State<Cart> {
+  @override
   Widget build(BuildContext context) {
+    int total=0;
+    final databaseReference = FirebaseDatabase.instance.ref('Account').child(widget.account).child('Cart');
   Size size = MediaQuery.of(context).size;
   return Scaffold(
     appBar: AppBar(
@@ -20,99 +30,167 @@ class Cart extends StatelessWidget {
         )
       ],
     ),
-    body: Container(
-      alignment: Alignment.center,
-      decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color(0xff574E6D),
-            Color.fromARGB(255, 23, 20, 32),
-          ],
-        ),
-      ),
-      child: Column(
+    body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Card_Item_Cart(size: size),
-                  Card_Item_Cart(size: size),
-                  Card_Item_Cart(size: size),
-                  Card_Item_Cart(size: size),
-                  Card_Item_Cart(size: size),
-                  Card_Item_Cart(size: size),
-                ],
-              ),
-            ),
-          ),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Positioned(
-                bottom: 0,
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 20) ,
-                  width: constraints.maxWidth,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
-                    ),
-                    color: Color(0xffDDDDDD),
-                  ),
-                  child:  Column(
-                    children: [
-                      SizedBox(height: 20,),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text('Dưa leo'),
-                          Text('30.000đ'),
-                        ],
-                      ),
-                      const SizedBox(width: 20),
-                      const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text('Dưa chuột'),
-                          Text('30.000đ'),
-                        ],
-                      ),
-                     const SizedBox(width: 20),
-                     const Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text('Burger'),
-                          Text('30.000đ'),
-                        ],
-                      ),
-                      GestureDetector(
-                        
-                        onTap: (){},
-                        child: Container(
-                          alignment: Alignment.center,
-                          height: size.height/15,
-                          width: size.width/4,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30),
-                            color: Color(0xff43405D),
+              child: FirebaseAnimatedList(
+                  query: databaseReference,
+                  itemBuilder: (context, snapshot, index, animation) {
+                    
+                    int ja=0;
+                    total+=int.tryParse(snapshot.child('pricetotal').value.toString()) ?? 0;
+                    print('ccccc ${total}');
+                     
+                     
+                    
+                    // if(animation % 2==0){
+                    //     color=0xffFFF; 
+                    // }
+                    // else {
+                    //   color=0xffEEEEEE;
+                    // }
+                    return GestureDetector(
+                      onTap: (){
+                        // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateCauthu(id: snapshot.child('nameCLB').value.toString())));
+                      },
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                          
+                        ),
+                        // color: Color(color),
+                        margin: const EdgeInsets.all(10),
+                        child: ListTile(
+                          title: Text(
+                            snapshot.child("name").value.toString(),
+                            
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 20,
+                            ),
                           ),
-                          child: Text('Buy now', style: TextStyle(color: Colors.white),),
+                          subtitle:Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Giá : '+snapshot.child("price").value.toString()+'đ'),
+                              
+                              // Text('Số lượng cầu thủ : ${snapshot.child('soLuong').value.toString()}'),
+                              Container(
+                                child: Column(
+                                  children: [Row(
+                                   children: [
+                                     ElevatedButton(
+                                      onPressed: (){
+                                        setState(() {
+                                          if((int.tryParse(snapshot.child('quant').value.toString()) ?? 0)<1){
+                                            databaseReference.child(snapshot.child('name').value.toString()) .update({
+                                            'quant':0,
+                                            'pricetotal':0,
+                                            // 'pricetotal':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0)
+                                      });   
+                                        }
+                                        else {
+                                          databaseReference.child(snapshot.child('name').value.toString()) .update({
+                                            'quant':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)-1,
+                                            // 'pricetotal':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0)
+                                      });
+                                      databaseReference.child(snapshot.child('name').value.toString()) .update({
+                                            // 'quant':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)-1,
+                                            'pricetotal':((int.tryParse(snapshot.child('quant').value.toString()) ?? 0)-1)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0)
+                                      });
+                                        }                             
+                                        });
+                                      },
+                                      child: Text('-'),
+                                    ),
+                                    Text(snapshot.child('quant').value.toString()),
+                                    ElevatedButton(
+                                      onPressed: (){
+                                        
+                                    setState(() {
+                                  
+                                        databaseReference.child(snapshot.child('name').value.toString()) .update({
+                                            'quant':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0) + 1,
+                                            // 'pricetotal':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0),
+                                      });
+                                      databaseReference.child(snapshot.child('name').value.toString()) .update({
+                                            // 'quant':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0) + 1,
+                                            'pricetotal':((int.tryParse(snapshot.child('quant').value.toString()) ?? 0)+1)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0)
+                                      });
+                                      
+                                    });
+                                       
+                                      },
+                                      child:const Text('+'),
+                                    ),
+                                    
+                                   ],
+                                  ),
+                                  Text('Tổng giá tiền 1 món : '+snapshot.child('pricetotal').value.toString()),
+                                  ]
+                                ),
+                              ),
+                            ],
+                          ),
+                              
+                          leading: CircleAvatar(
+                            radius: 50,
+                              child: ClipOval(
+                                child: Image.network(snapshot.child('image').value.toString()),
+                              ),
+                            
+                          ),
+                          
+                          trailing: PopupMenuButton(
+                            icon: const Icon(Icons.more_vert),
+                            itemBuilder: (context) => [
+                              // For Update Operation
+                              PopupMenuItem(
+                                value: 1,
+                                child: ListTile(
+                                  onTap: () {
+                                    // Navigator.pop(context);
+                                    // showModalBottomSheet(context: context, builder: (BuildContext context){
+                                    //     // return UpdateBottom(
+                                    //     // name: snapshot.child('nameCate').value.toString(),
+                                    //     // des: snapshot.child('des').value.toString(),
+                                    //     // img: snapshot.child('img').value.toString(), 
+                                    //     // id: snapshot.child('idCate').value.toString(),
+                                    //     // );
+                                    // });
+                                  },
+                                  leading: const Icon(Icons.edit),
+                                  title: const Text("Edit"),
+                                ),
+                              ),
+                              // For Delete Operation
+                              PopupMenuItem(
+                                value: 2,
+                                child: ListTile(
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    databaseReference.child('name ${snapshot.child('nameCLB').value.toString()}')
+                                        .remove();
+                                  },
+                                  leading: const Icon(Icons.delete),
+                                  title: const Text("Delete"),
+                                ),
+                              ),
+                            ],
+                          ),
+
                         ),
                       ),
-                      SizedBox(height: 5,)
-                    ],
-                  ),
-
-                ),
-              );
-            },
-          ),
-        ],
+                    );
+      
+                  })),
+                  ElevatedButton(onPressed: (
+                    
+                  ){
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ConfirmPage(account: widget.account,)));
+                  }, child: Text('Xác nhận mua', style: TextStyle(color: Colors.black),))
+        ]
       ),
-    ),
   );
 }
 }
