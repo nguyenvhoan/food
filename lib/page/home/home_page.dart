@@ -1,7 +1,9 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:food_market/models/database_service.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/cart_page.dart';
@@ -12,34 +14,46 @@ import 'package:food_market/page/home/widgets/home_content.dart';
 
 class HomePage extends StatefulWidget {
   String account;
-   HomePage({super.key, required this.account});
+  List<Product> items;
+   HomePage({super.key, required this.account, required this.items});
   
 
   @override
   State<HomePage> createState() => _SearchBarAppState();
   
 }
+
+List<Product> cc = [];
+List<String> data=[];
+String account='';
 final databaseReference =FirebaseDatabase.instance.ref('Product');
 DatabaseService _databaseService= DatabaseService();
 final List<Product> list=[]; 
 class _SearchBarAppState extends State<HomePage> {
   bool isDark = false;
   List<Product> pro = [];
+  
 @override
   void initState() {
     super.initState();
-    _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
+     // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
+     for(int i =0; i<widget.items.length;i++){
+      data.add(widget.items[i].name);
+     }
+     cc=widget.items;
+     account=widget.account;
   }
-List<Product> items=[];
-  Future <void> _loadProductData() async {
-    await _databaseService.readProductData(pro);
-    setState(() {});
+  List<String> searchResults = [];
+
+  void onQueryChanged(String query) {
+    setState(() {
+      searchResults = data
+          .where((item) => item.toLowerCase().contains(query.toLowerCase()))
+          .toList();
+    });
   }
-  void update(String value) {
-  setState(() {
-    items = pro.where((element) => element.name!.toLowerCase().contains(value.toLowerCase())).toList();
-  });
-}
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -70,149 +84,317 @@ List<Product> items=[];
   ],  
       ),
         body: Column(
+          
+          crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-  padding: const EdgeInsets.all(8.0),
-  child: SearchAnchor(
-    builder: (BuildContext context, SearchController controller) {
-      return SearchBar(
-        onChanged: (value) => update(value),
-        controller: controller,
-        padding: const MaterialStatePropertyAll<EdgeInsets>(
-          EdgeInsets.symmetric(horizontal: 16.0),
-        ),
-        onTap: () {
-          controller.openView();
-        },
-        leading: const Icon(Icons.search),
-        trailing: <Widget>[
-          Tooltip(
-            message: 'Change brightness mode',
-            child: IconButton(
-              isSelected: isDark,
-              onPressed: () {
-                setState(() {
-                  isDark = !isDark;
-                });
-              },
-              icon: const Icon(Icons.wb_sunny_outlined),
-              selectedIcon: const Icon(Icons.brightness_2_outlined),
-            ),
-          )
-        ],
-      );
-    },
-    suggestionsBuilder: (BuildContext context, SearchController controller) {
-      return List<ListTile>.generate(
-        items.length,
-        (int index) {
-          final String item = '${items[index].name.toString()}';
-          return ListTile(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-            ),
-            title: Text(item),
-            leading: CircleAvatar(
-              child: ClipOval(
-                child: Image.network(items[index].image),
+          
+          GestureDetector(
+            onTap: (){
+              showSearch(context: context, delegate: CustomSearch());
+            },
+            child: Container(
+              margin: EdgeInsets.symmetric(horizontal: 20),
+              width: double.infinity,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.blue, // Màu viền
+                  width: 2.0, // Độ rộng viền
+                  style: BorderStyle.solid, // Kiểu viền
+                ),
+                borderRadius: BorderRadius.circular(20.0),
+                
+              ),
+              
+              child: Row(
+                children:[
+                  IconButton(
+                  onPressed: () {
+                    showSearch(context: context, delegate: CustomSearch());
+                  },
+                  icon: Icon(Icons.search),
+                
+                ),
+                Text('Tìm kiếm')
+                ] 
               ),
             ),
-            subtitle: Text('Giá : ${items[index].price}'),
-            onTap: () {
-              setState(() {
-                controller.closeView(item);
-              });
-            },
-          );
-        },
-      );
-    },
-  ),
-),
-          Text('Cơm' ,style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+          
+        
+ 
+SizedBox(height: 10,),
+          const Row(
+             
+            children:
+            [
+              SizedBox(width: 25,) ,
+              Text('Cơm' ,style: TextStyle(fontSize: 24, color: Color(0xff574E6D), fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+             textAlign: TextAlign.left,),] 
+          ),
           hoilamgi('Cơm'),
-          Text('Nước' ,style: TextStyle(fontSize: 20, color: Colors.red, fontWeight: FontWeight.bold)),
-          hoilamgi('Nước Uống'),
+          SizedBox(height: 10,),
+          const Row(
+             
+            children:
+            [
+              SizedBox(width: 25,) ,
+              Text('Nước uống' ,style: TextStyle(fontSize: 24, color: Color(0xff574E6D), fontWeight: FontWeight.bold, fontStyle: FontStyle.italic),
+             textAlign: TextAlign.left,),] 
+          ),          hoilamgi('Nước Uống'),
+          
                   
         ]
+        
       ),
       ),
     );
   }
-
+final _scrollController = ScrollController();
   Expanded hoilamgi(String cc) {
     return Expanded(
-            child: FirebaseAnimatedList(
-                query: databaseReference,
-                itemBuilder: (context, snapshot, index, animation) {
-                  String test="";
-                  if(animation==1){
-                    test=cc;
-                  }
-                  else test="";
-                  if(snapshot.child('category').value.toString()==cc){
-                    return GestureDetector(
-                    onTap: (){
-                      Product pro = Product(
-                      id: snapshot.child('id').value.toString(), 
-                      name: snapshot.child('name').value.toString(), 
-                      category: snapshot.child('category').value.toString(), 
-                      image: snapshot.child('image').value.toString(), 
-                      price: int.tryParse(snapshot.child('price').value.toString()) ?? 0,  
-                      des: snapshot.child('des').value.toString(), );
-                      Navigator.push(context, MaterialPageRoute(builder: (context)=>DetailPage(product: pro,account:widget.account)));
-                    },
-                    child: Column(
-                      children:[                      
-                        Card(
-                          color: Color(0xff574E6D),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                          
+  child: Scrollbar(
+    controller: _scrollController,
+
+    thumbVisibility: true, // Hiển thị thanh cuộn khi cần
+    child: FirebaseAnimatedList(
+      query: databaseReference,
+      itemBuilder: (context, snapshot, index, animation) {
+        String test = "";
+        if (animation == 1) {
+          test = cc;
+        } else {
+          test = "";
+        }
+        if (snapshot.child('category').value.toString() == cc) {
+          return GestureDetector(
+            onTap: () {
+              Product pro = Product(
+                id: snapshot.child('id').value.toString(),
+                name: snapshot.child('name').value.toString(),
+                category: snapshot.child('category').value.toString(),
+                image: snapshot.child('image').value.toString(),
+                price: int.tryParse(snapshot.child('price').value.toString()) ?? 0,
+                des: snapshot.child('des').value.toString(),
+              );
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => DetailPage(product: pro, account: widget.account),
+                ),
+              );
+            },
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: Card(
+                      
+                      color: Color(0xff574E6D),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      margin: const EdgeInsets.all(10),
+                      child: ListTile(
+                        title: Text(
+                          snapshot.child("name").value.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                          ),
                         ),
-                        // color: Color(color),
-                        margin: const EdgeInsets.all(10),
-                        child: ListTile(
-                          title: Text(
-                            snapshot.child("name").value.toString(),
-                            
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Giá : ' + snapshot.child("price").value.toString() + 'đ',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                        leading: CircleAvatar(
+                          radius: 50,
+                          child: ClipOval(
+                            child: Image.network(
+                              snapshot.child('image').value.toString(),
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                          subtitle:Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Giá : '+snapshot.child("price").value.toString()+'đ',
-                              style: TextStyle(color: Colors.white,),),
-                              // Text('Số lượng cầu thủ : ${snapshot.child('soLuong').value.toString()}'),
-                      
-                            ],
-                          ),
-                              
-                          leading: CircleAvatar(
-                            radius: 50,
-                              child: ClipOval(
-                                child: Image.network(snapshot.child('image').value.toString(),
-                                                            ),
-                              ),
-                            
-                          ),
-                          
-                          
                         ),
                       ),
-                      ] 
                     ),
-                  );
-                  }
-                  else return Container();
-                  
-    
-                }));
+                  ),
+                ],
+              ),
+            ),
+          );
+        } else {
+          return Container();
+        }
+      },
+    ),
+  ),
+);
   }
 
   
+}
+class CustomSearch extends SearchDelegate{
+  
+  @override
+  List<Widget>? buildActions(BuildContext context) {
+    // TODO: implement buildActions
+    return[
+      IconButton(onPressed: (){
+        query=' ';
+      }, icon: Icon(Icons.clear))
+    ];
+  }
+
+  @override
+  Widget? buildLeading(BuildContext context) {
+    // TODO: implement buildLeading
+    return IconButton(onPressed: (){
+      close(context, null);
+      
+    }, icon: Icon(Icons.arrow_back),);
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+   List<Product> matchQuey =[];
+    for(var item in cc){
+      if(item.name.toLowerCase().contains(query.toLowerCase())){
+        matchQuey.add(item);
+      }
+    }
+    return ListView.builder(itemBuilder: (context, index){
+      var result = matchQuey[index].name;
+      return Container(
+        margin: EdgeInsets.all(5),
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20),
+        color: Color(0xff574E6D),),
+        
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:[
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25),
+              child: Image.network(matchQuey[index].image,
+              width: 100,
+              height: 100,fit: BoxFit.cover,),
+            ),
+           Expanded(
+             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(result, style: TextStyle(color: Colors.white, fontSize: 18),),
+             Text('Giá : ' + matchQuey[index].price.toString()+'đ', style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),),
+             
+                
+              Text(matchQuey[index].des,
+                  maxLines: 2,
+                  
+                  softWrap: true,
+                  overflow: TextOverflow.ellipsis,style: TextStyle(fontSize: 12.0, color: Colors.white, fontStyle: FontStyle.italic ),
+                  ),
+                
+              ],
+              
+             ),
+           ),
+          
+        ]),
+      );
+    },
+    itemCount: matchQuey.length,);
+ 
+  }
+
+  @override
+Widget buildSuggestions(BuildContext context) {
+  List<Product> matchedProducts = [];
+  for (var item in cc) {
+    if (item.name.toLowerCase().contains(query.toLowerCase())) {
+      matchedProducts.add(item);
+    }
+  }
+
+  return ListView.builder(
+    itemCount: matchedProducts.length,
+    itemBuilder: (context, index) {
+      var result = matchedProducts[index].name;
+      return GestureDetector(
+        onTap: () {
+          // Navigate to the detail page when a suggestion is tapped
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DetailPage(
+                product: matchedProducts[index],
+                account: account,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: Color(0xff574E6D),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: 25),
+                child: Image.network(
+                  matchedProducts[index].image,
+                  width: 100,
+                  height: 100,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      result,
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    ),
+                    Text(
+                      'Giá : ' + matchedProducts[index].price.toString() + 'đ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                    Text(
+                      matchedProducts[index].des,
+                      maxLines: 2,
+                      softWrap: true,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 12.0,
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
+
 }

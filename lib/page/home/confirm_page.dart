@@ -67,8 +67,10 @@ class _ConfirmPageState extends State<ConfirmPage> {
                           subtitle:Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Giá : '+snapshot.child("price").value.toString()+'đ'),
-                              
+                              Text('Giá gốc : '+snapshot.child("price").value.toString()+'đ'),
+                              Text('Số lượng : '+snapshot.child("quant").value.toString()+'món'),
+                              Text('Tổng giá tiền : '+snapshot.child("pricetotal").value.toString()+'đ'),
+                        
                               // Text('Số lượng cầu thủ : ${snapshot.child('soLuong').value.toString()}'),
                               
                             ],
@@ -83,32 +85,28 @@ class _ConfirmPageState extends State<ConfirmPage> {
                           ),
                           
                           trailing: PopupMenuButton(
+                            offset: Offset(0, 50),
+                            elevation: 2,
+                            iconSize: 30.0,
+                            color: Color(0xff574E6D),
+                            shadowColor: Colors.black,
                             icon: const Icon(Icons.more_vert),
                             itemBuilder: (context) => [
                               // For Update Operation
                               PopupMenuItem(
+                                
+                                height: 10,
                                 value: 1,
                                 child: ListTile(
                                   onTap: () {
                                     Navigator.push(context, MaterialPageRoute(builder: (context)=>Cart(account: widget.account)));
                                   },
-                                  leading: const Icon(Icons.edit),
-                                  title: const Text("Edit"),
+                                  leading: const Icon(Icons.edit, color: Colors.white,),
+                                  title: const Text("Chỉnh sửa ", style: TextStyle(color: Colors.white  ),),
                                 ),
                               ),
                               // For Delete Operation
-                              PopupMenuItem(
-                                value: 2,
-                                child: ListTile(
-                                  onTap: () {
-                                    Navigator.pop(context);
-                                    databaseReference.child('name ${snapshot.child('nameCLB').value.toString()}')
-                                        .remove();
-                                  },
-                                  leading: const Icon(Icons.delete),
-                                  title: const Text("Delete"),
-                                ),
-                              ),
+                              
                             ],
                           ),
 

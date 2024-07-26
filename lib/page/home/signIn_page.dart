@@ -1,10 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/widgets/signIn_content.dart';
 import 'package:food_market/page/home/widgets/signIn_icon_top.dart';
 
-class SignIn extends StatelessWidget{
+class SignIn extends StatefulWidget{
   const SignIn({super.key});
-  
+
+  @override
+  State<SignIn> createState() => _SignInState();
+}
+
+class _SignInState extends State<SignIn> {
+  List<Product> items=[];
+  DatabaseService _databaseService= DatabaseService();
+  @override
+  void initState() {
+    super.initState();
+    _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
+  }
+
+  Future <void> _loadProductData() async {
+    await _databaseService.readProductData(items);
+    setState(() {});
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,18 +48,16 @@ class SignIn extends StatelessWidget{
             
           )
         ),
-        child:const SingleChildScrollView(
+        child: SingleChildScrollView(
           child:  Column(
             children: [
-               
-             
+        
               SignInIcon(),
-              SignInContent(),
+              SignInContent(items: items,),
             ],
           ),
         ),
       ),
     );
   }
-  
 }
