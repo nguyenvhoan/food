@@ -1,12 +1,45 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:food_market/models/account.dart';
 
-class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+class ProfilePage extends StatefulWidget {
+   ProfilePage({super.key, required this.acc});
+String acc;
+
 
   @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+ String name = '';
+ late String avt;
+class _ProfilePageState extends State<ProfilePage> {
+  final databaseReference = FirebaseDatabase.instance.ref("Account");
+   @override
+  void initState() {
+    super.initState();
+   
+    loadAccountData();
+  }
+
+  void loadAccountData() {
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      if (event.snapshot.exists) {
+        setState(() {
+          name = event.snapshot.child(widget.acc).child('name').value.toString();
+          avt = event.snapshot.child(widget.acc).child('avatar').value.toString();
+        });
+      } else {
+        print('No data available.');
+      }
+    }, onError: (error) {
+      print('Error: $error');
+    });
+  }
+  @override
   Widget build(BuildContext context) {
+        
     Size size = MediaQuery.sizeOf(context);
     return Scaffold(
       body: Container(
@@ -52,7 +85,7 @@ class ProfilePage extends StatelessWidget {
                     width: 2.0
                   )
                 ),
-              child: Text('Nguyễn Văn Hoàn', style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+              child: Text(name, style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
             ),
             SizedBox(height: 5,), 
               Container(
@@ -133,10 +166,11 @@ class ProfilePage extends StatelessWidget {
                 top: 15, // Di chuyển hình ảnh lên 20 điểm
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(20),
-                  child: Image.asset(
-                    'asset/images/avatar/image.png',
+                  child: Image.network(
+                    avt,
                     height: 150,
                     width: 150,
+                      fit: BoxFit.cover,
                   ),
                 ),
               ),
@@ -147,4 +181,6 @@ class ProfilePage extends StatelessWidget {
     );
     
   }
-}
+
+  }
+  

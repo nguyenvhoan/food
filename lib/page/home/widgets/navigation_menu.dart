@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/cart_page.dart';
 import 'package:food_market/page/home/favourite.dart';
 import 'package:food_market/page/home/home_page.dart';
@@ -8,9 +9,9 @@ import 'package:food_market/page/home/profile_page.dart';
 
 
 class NavigationMenu extends StatefulWidget {
-  var account;
+  var account;List<Product> items;
   
-   NavigationMenu({super.key, required this.account});
+   NavigationMenu({super.key, required this.account, required this.items});
    
 
   @override
@@ -19,12 +20,13 @@ class NavigationMenu extends StatefulWidget {
 
 class _NavigationMenuState extends State<NavigationMenu> {
    late var account;
+   
   int myCurrentindex=0;
   List<Widget> get page => [
-    HomePage(account: account),
+    HomePage(account: account, items: widget.items,),
     Favourite(account: account),
     Cart(account: account,),
-    ProfilePage(),
+    ProfilePage(acc: account,),
   ] ;
   
 @override

@@ -82,10 +82,10 @@ class _CartState extends State<Cart> {
                                      ElevatedButton(
                                       onPressed: (){
                                         setState(() {
-                                          if((int.tryParse(snapshot.child('quant').value.toString()) ?? 0)<1){
+                                          if((int.tryParse(snapshot.child('quant').value.toString()) ?? 0)<2){
                                             databaseReference.child(snapshot.child('name').value.toString()) .update({
-                                            'quant':0,
-                                            'pricetotal':0,
+                                            'quant':1,
+                                            'pricetotal':snapshot.child('price').value.toString(),
                                             // 'pricetotal':(int.tryParse(snapshot.child('quant').value.toString()) ?? 0)*(int.tryParse(snapshot.child('price').value.toString()) ?? 0)
                                       });   
                                         }
@@ -126,7 +126,7 @@ class _CartState extends State<Cart> {
                                     
                                    ],
                                   ),
-                                  Text('Tổng giá tiền 1 món : '+snapshot.child('pricetotal').value.toString()),
+                                  Text('Tổng giá tiền ${snapshot.child('quant').value.toString()} món : '+snapshot.child('pricetotal').value.toString()+ "đ"),
                                   ]
                                 ),
                               ),
@@ -142,38 +142,23 @@ class _CartState extends State<Cart> {
                           ),
                           
                           trailing: PopupMenuButton(
+                            offset: Offset(0, 50),
+                            color: Color(0xff574E6D),
                             icon: const Icon(Icons.more_vert),
                             itemBuilder: (context) => [
                               // For Update Operation
+                              
+                              // For Delete Operation
                               PopupMenuItem(
                                 value: 1,
                                 child: ListTile(
                                   onTap: () {
-                                    // Navigator.pop(context);
-                                    // showModalBottomSheet(context: context, builder: (BuildContext context){
-                                    //     // return UpdateBottom(
-                                    //     // name: snapshot.child('nameCate').value.toString(),
-                                    //     // des: snapshot.child('des').value.toString(),
-                                    //     // img: snapshot.child('img').value.toString(), 
-                                    //     // id: snapshot.child('idCate').value.toString(),
-                                    //     // );
-                                    // });
-                                  },
-                                  leading: const Icon(Icons.edit),
-                                  title: const Text("Edit"),
-                                ),
-                              ),
-                              // For Delete Operation
-                              PopupMenuItem(
-                                value: 2,
-                                child: ListTile(
-                                  onTap: () {
                                     Navigator.pop(context);
-                                    databaseReference.child('name ${snapshot.child('nameCLB').value.toString()}')
+                                    databaseReference.child(snapshot.child('name').value.toString())
                                         .remove();
                                   },
-                                  leading: const Icon(Icons.delete),
-                                  title: const Text("Delete"),
+                                  leading: const Icon(Icons.delete, color: Colors.white,),
+                                  title: const Text("Xóa món", style: TextStyle(color: Colors.white),),
                                 ),
                               ),
                             ],
@@ -185,7 +170,6 @@ class _CartState extends State<Cart> {
       
                   })),
                   ElevatedButton(onPressed: (
-                    
                   ){
                     Navigator.push(context, MaterialPageRoute(builder: (context)=>ConfirmPage(account: widget.account,)));
                   }, child: Text('Xác nhận mua', style: TextStyle(color: Colors.black),))

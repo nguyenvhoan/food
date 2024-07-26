@@ -6,12 +6,15 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:food_market/models/product.dart';
+import 'package:food_market/page/admin/widget/bottom_option_category.dart';
 import 'package:food_market/page/home/home_page.dart';
 import 'package:food_market/page/home/register_page.dart';
 import 'package:food_market/page/home/widgets/navigation_menu.dart';
 
 class SignInContent extends StatefulWidget{
-  const SignInContent({super.key});
+  List<Product> items;
+   SignInContent({super.key, required this.items});
 
   @override
   State<SignInContent> createState() => _SignInContentState();
@@ -28,29 +31,54 @@ class _SignInContentState extends State<SignInContent> {
       try{
          String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
       print('User ID: $userId');
-      
-
-
         await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
-        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavigationMenu(account:  FirebaseAuth.instance.currentUser?.uid ?? '',)));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text( 'Đăng nhập thành công',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18, ),
+          ),
+          backgroundColor: Colors.black,
+          shape: Border.all(
+            width: 1,
+            color: Colors.white
+          ),
+          behavior: SnackBarBehavior.floating,
+          ),
+          
+          );
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>NavigationMenu(account:  FirebaseAuth.instance.currentUser?.uid ?? '',items: widget.items,)));
 
       }
       on FirebaseAuthException catch (e){
         if(e.code=='user-not-found'){
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('No User Found For That Email',
-          style: TextStyle(fontSize: 18),
+          print('No User Found For That Email');
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Email không tồn tại hoặc chưa đăng ký',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18,),
           ),
-          backgroundColor: Colors.orangeAccent,
-
-          ));
+          backgroundColor: Colors.black,
+          shape: Border.all(
+            width: 1,
+            color: Colors.white
+          ),
+          behavior: SnackBarBehavior.floating,
+          
+          ),
+          );
           
         }
         else if(e.code=='wrong-password'){
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text( 'Wrong Password Provide by User',
-          style: TextStyle(fontSize: 18),
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text( 'Mật khẩu không chính xác',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 18, ),
           ),
-          backgroundColor: Colors.orangeAccent,
+          backgroundColor: Colors.black,
+          shape: Border.all(
+            width: 1,
+            color: Colors.white
           ),
+          behavior: SnackBarBehavior.floating,
+          ),
+          
           );
         }
       }
@@ -166,9 +194,10 @@ class _SignInContentState extends State<SignInContent> {
                              ),
                ),
               SizedBox(
-                height: size.height/8,
+                height: size.height/8,  
               ),
               GestureDetector(
+                
                 onTap:  () {
                   if(_formkey.currentState!.validate()){
                     setState(() {
@@ -200,6 +229,7 @@ class _SignInContentState extends State<SignInContent> {
                   ),
                 ),
               ),
+              Padding(padding: EdgeInsets.all(100))
             ],
           ),
         ),
