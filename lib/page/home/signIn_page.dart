@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/widgets/signIn_content.dart';
 import 'package:food_market/page/home/widgets/signIn_icon_top.dart';
@@ -13,10 +14,12 @@ class SignIn extends StatefulWidget{
 
 class _SignInState extends State<SignIn> {
   List<Product> items=[];
+  
   DatabaseService _databaseService= DatabaseService();
   @override
   void initState() {
     super.initState();
+    
     _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
   }
 

@@ -7,7 +7,7 @@ class TPPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final databaseReference = FirebaseDatabase.instance.ref('Account').child(account).child('Cart').remove();
+    // final databaseReference = FirebaseDatabase.instance.ref('Account').child(account).child('Cart').remove();
     
     return Scaffold(
       body: Container(alignment: Alignment.center,

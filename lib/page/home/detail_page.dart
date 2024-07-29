@@ -1,16 +1,23 @@
+
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
+import 'package:food_market/models/account.dart';
+
 import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/models/cart.dart';
 import 'package:food_market/page/home/cart_page.dart';
+import 'package:food_market/page/home/comment_page.dart';
 
 class DetailPage extends StatelessWidget {
   Product product;
   String account;
+  List<DiscountABC> diss=[];
+  
   DatabaseService _databaseService=DatabaseService();
-   DetailPage({super.key, required this.product, required this.account});
+   DetailPage({super.key, required this.product, required this.account, required this.diss});
 
   @override
   Widget build(BuildContext context) {
@@ -64,10 +71,16 @@ class DetailPage extends StatelessWidget {
 
            Image.network(product.image, width: double.infinity,height: 100,),
              Text(product.name, style: TextStyle(fontSize: 30,fontWeight: FontWeight.bold,color: Colors.white),textAlign: TextAlign.left,),
-            const Row(
+             Row(
               mainAxisAlignment: MainAxisAlignment.center, 
               children:[
-              Text('25k bình luận',style: TextStyle(fontSize: 15,color: Colors.white),),
+              GestureDetector(
+                onTap: (){
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Comment(id: account,product: product,)));
+                },
+                child: Text('25k bình luận',style: TextStyle(fontSize: 15,color: Colors.white),
+                )
+                ),
               Icon(Icons.chevron_right, color: Colors.white,),
             ] 
             
@@ -115,7 +128,7 @@ class DetailPage extends StatelessWidget {
                         );
                       _databaseService.addtocart(cart, account);
                       Navigator.push(context, 
-                      MaterialPageRoute(builder: (context)=> Cart(account: account,)),
+                      MaterialPageRoute(builder: (context)=> Cart(account: account,diss: diss,)),
                       );
                     },
                     child: Container(

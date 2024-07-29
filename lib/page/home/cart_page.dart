@@ -2,12 +2,15 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 import 'package:flutter/material.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/page/home/confirm_page.dart';
+import 'package:food_market/page/home/home_page.dart';
 
 
 class Cart extends StatefulWidget {
   var  account;
-   Cart({super.key, required this.account});
+  List<DiscountABC> diss;
+   Cart({super.key, required this.account, required this.diss});
 
   @override
   State<Cart> createState() => _CartState();
@@ -36,13 +39,9 @@ class _CartState extends State<Cart> {
               child: FirebaseAnimatedList(
                   query: databaseReference,
                   itemBuilder: (context, snapshot, index, animation) {
-                    
                     int ja=0;
                     total+=int.tryParse(snapshot.child('pricetotal').value.toString()) ?? 0;
                     print('ccccc ${total}');
-                     
-                     
-                    
                     // if(animation % 2==0){
                     //     color=0xffFFF; 
                     // }
@@ -171,7 +170,7 @@ class _CartState extends State<Cart> {
                   })),
                   ElevatedButton(onPressed: (
                   ){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ConfirmPage(account: widget.account,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ConfirmPage(account: widget.account,diss: diss,)));
                   }, child: Text('Xác nhận mua', style: TextStyle(color: Colors.black),))
         ]
       ),

@@ -1,7 +1,12 @@
 
 
+
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:food_market/models/account.dart';
+import 'package:food_market/models/comment.dart';
+import 'package:food_market/models/discount.dart';
 
 import 'package:food_market/models/product.dart';
 import 'package:food_market/models/category.dart';
@@ -149,5 +154,49 @@ Future<void> createHis(String account,String id2) async {
         print(e.toString());
       }
     }
+    Future<void> createComment(CommentABC cmt, String id) async {
+      try {
+        
+        await _real.ref("Comment").set(cmt.toMap());
+        
+      } catch (e) {
+        print(e.toString());
+      }
+    }
+
+ Future<void> readAccount( Account a,String id) async {
+  try {
+    a=Account(id: id, name: 'name', email: 'email', password: 'password');
+  } catch (e) {
+    // Log the error or return a default/empty Account object
+    print('Error reading account: $e');
     
+} 
+}
+Future<void> readDis(List<DiscountABC> lstDis) async {
+    
+    try {
+      final data = await _real.ref("Discount").once();
+      final snapshots = data.snapshot.children;
+      
+      for (final snapshot in snapshots) {
+
+    final id = snapshot.child('id').value as String;
+    final name = snapshot.child('name').value as String;
+    final ma = snapshot.child('ma').value.toString();
+    int? per = int.tryParse(snapshot.child('per').value.toString());
+
+    final product = DiscountABC(
+    id: id!,
+    name: name,
+    ma: ma,
+    per: per!,
+  );
+  print(product.toMap());
+  lstDis.add(product);
+  }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
 }
