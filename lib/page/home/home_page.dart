@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/page/home/cart_page.dart';
 import 'package:food_market/page/home/detail_page.dart';
@@ -25,6 +26,7 @@ class HomePage extends StatefulWidget {
 
 List<Product> cc = [];
 List<String> data=[];
+List<DiscountABC> diss=[];
 String account='';
 final databaseReference =FirebaseDatabase.instance.ref('Product');
 DatabaseService _databaseService= DatabaseService();
@@ -42,6 +44,7 @@ class _SearchBarAppState extends State<HomePage> {
      }
      cc=widget.items;
      account=widget.account;
+     _loadDisData();
   }
   List<String> searchResults = [];
 
@@ -51,6 +54,10 @@ class _SearchBarAppState extends State<HomePage> {
           .where((item) => item.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+  Future <void> _loadDisData() async {
+    await _databaseService.readDis(diss);
+    setState(() {});
   }
 
   
@@ -77,7 +84,7 @@ class _SearchBarAppState extends State<HomePage> {
     IconButton(
       icon: Image.asset('asset/images/icons/Cart.png'),
       onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context)=> Cart(account: widget.account,)));
+        Navigator.push(context, MaterialPageRoute(builder: (context)=> Cart(account: widget.account,diss: diss,)));
         // Xử lý sự kiện khi nhấn vào icon
       },
     ),
@@ -179,7 +186,7 @@ final _scrollController = ScrollController();
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => DetailPage(product: pro, account: widget.account),
+                  builder: (context) => DetailPage(product: pro, account: widget.account, diss: diss,),
                 ),
               );
             },
@@ -338,6 +345,7 @@ Widget buildSuggestions(BuildContext context) {
               builder: (context) => DetailPage(
                 product: matchedProducts[index],
                 account: account,
+              diss: diss,
               ),
             ),
           );

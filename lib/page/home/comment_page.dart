@@ -1,48 +1,46 @@
-
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:food_market/models/category.dart';
+import 'package:food_market/models/account.dart';
 import 'package:food_market/models/database_service.dart';
-import 'package:food_market/page/admin/widget/bottom_createDis.dart';
+import 'package:food_market/models/product.dart';
 import 'package:food_market/page/admin/widget/bottom_option_category.dart';
 import 'package:food_market/page/admin/widget/update_bottom_sheet.dart';
+import 'package:food_market/page/home/create_comment.dart';
 
-
-
-class AdminDis extends StatefulWidget {
-   AdminDis({super.key});
+class Comment extends StatefulWidget {
+   Comment({super.key, required this.id, required this.product});
+   String id;
+   Product product;
 
   @override
-  State<AdminDis> createState() => _AdminDisState();
+  State<Comment> createState() => _CommentState();
 }
 
-class _AdminDisState extends State<AdminDis> {
-  var color=0xffDDDDDD;
-  final _databaseService = DatabaseService();
-  final databaseReference = FirebaseDatabase.instance.ref("Discount");
-  List<Category> items = []; // Khai báo items là một danh sách rỗng
-
+class _CommentState extends State<Comment> {
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    // _loadProductData(); // Gọi hàm để đọc dữ liệu sản phẩm từ DatabaseService
+    // _databaseService.readAccount(ab, widget.id);
   }
+  var color=0xffDDDDDD;
+  
+  final _databaseService = DatabaseService();
 
-  // Future <void> _loadProductData() async {
-  //   await _databaseService.readCLBData(items);
-  //   setState(() {});
-  // }
+  final databaseReference = FirebaseDatabase.instance.ref("Comment");
+
+ 
+
   @override
   Widget build(BuildContext context) {
-    // Sử dụng items để xây dựng giao diện
+     
+    
     return Scaffold(
       
       appBar: AppBar(
         backgroundColor: Color(0xff574E6D),
         centerTitle: true,
-        title:const Text('Danh sách mã giảm giá', style: TextStyle(
+        title:const Text('Những loại sản phẩm', style: TextStyle(
           fontSize: 30, fontWeight: FontWeight.bold,
           color: Colors.white
           
@@ -61,7 +59,9 @@ class _AdminDisState extends State<AdminDis> {
                     else {
                       color=0xffEEEEEE;
                     }
-                    return GestureDetector(
+                    if(snapshot.child('name').value.toString()==(widget.product.name))
+                    {
+                        return GestureDetector(
                       onTap: (){
                         // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateCauthu(id: snapshot.child('nameCLB').value.toString())));
                       },
@@ -74,7 +74,6 @@ class _AdminDisState extends State<AdminDis> {
                         margin: const EdgeInsets.all(10),
                         child: ListTile(
                           title: Text(
-                            'Nội dung: '+
                             snapshot.child("name").value.toString(),
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -84,21 +83,23 @@ class _AdminDisState extends State<AdminDis> {
                           subtitle:Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Phần trăm giảm giá: '+snapshot.child("per").value.toString()+'%'),
-                              Text('Mã giảm giá: '+snapshot.child("ma").value.toString()),
+                              
+                              Text('Ngày đăng '+snapshot.child("date").value.toString(), maxLines: 1,),
+                              Text('ID User: '+snapshot.child("acc").value.toString(), maxLines: 1,),
                               // Text('Số lượng cầu thủ : ${snapshot.child('soLuong').value.toString()}'),
+                              Text('Chi tiết : ' +snapshot.child("detail").value.toString(), maxLines: 4,),
                       
                             ],
                           ),
                               
-                          // leading: CircleAvatar(
-                          //   radius: 50,
-                          //     child: ClipOval(
-                          //       child: Image.network(snapshot.child('img').value.toString(),
-                          //                                   ),
-                          //     ),
+                          leading: CircleAvatar(
+                            radius: 50,
+                              child: ClipOval(
+                                child: Image.network(snapshot.child('img').value.toString(),
+                                                            ),
+                              ),
                             
-                          // ),
+                          ),
                           
                           trailing: PopupMenuButton(
                             icon: const Icon(Icons.more_vert),
@@ -140,11 +141,13 @@ class _AdminDisState extends State<AdminDis> {
                         ),
                       ),
                     );
+                    }
+                    else return Container();
+
+                    
       
                   })),
-                  ElevatedButton(onPressed: (){
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
-                  }, child: Text('Xếp bảng đấu', style: TextStyle(color: Colors.black),))
+                  
         ]
       ),
 
@@ -152,11 +155,10 @@ class _AdminDisState extends State<AdminDis> {
   child: Icon(Icons.add),
   onPressed: (){
     showModalBottomSheet(context: context, builder: (BuildContext content){
-      return BottomCreateDis();
+      return BottomCreateComment(acc: widget.id,pro: widget.product,);
     });
   }
 ),
     );
   }
-
 }

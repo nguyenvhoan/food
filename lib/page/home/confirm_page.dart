@@ -1,15 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_database/ui/firebase_animated_list.dart';
 import 'package:flutter/material.dart';
-import 'package:food_market/models/cart.dart';
 import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/page/home/cart_page.dart';
-import 'package:food_market/page/home/tp_page.dart';
+import 'package:food_market/page/home/home_page.dart';
+
+import 'package:food_market/page/payment.dart';
 
 class ConfirmPage extends StatefulWidget {
-   ConfirmPage({super.key, required this.account});
+   ConfirmPage({super.key, required this.account, required this.diss});
   String account;
+  List<DiscountABC> diss=[];
   
   @override
   State<ConfirmPage> createState() => _ConfirmPageState();
@@ -17,9 +20,11 @@ class ConfirmPage extends StatefulWidget {
 
 List<int> gia=[0,0,0,0,0,0,0,0,0,0];
 
-
+String id="";
 class _ConfirmPageState extends State<ConfirmPage> {
+  
   DatabaseService databaseService = DatabaseService();
+  TextEditingController name = TextEditingController();
   @override
   Widget build(BuildContext context) {
     
@@ -99,7 +104,7 @@ class _ConfirmPageState extends State<ConfirmPage> {
                                 value: 1,
                                 child: ListTile(
                                   onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>Cart(account: widget.account)));
+                                    Navigator.push(context, MaterialPageRoute(builder: (context)=>Cart(account: widget.account, diss: widget.diss,)));
                                   },
                                   leading: const Icon(Icons.edit, color: Colors.white,),
                                   title: const Text("Chỉnh sửa ", style: TextStyle(color: Colors.white  ),),
@@ -115,26 +120,64 @@ class _ConfirmPageState extends State<ConfirmPage> {
                     );
       
                   })),
+                  
+                   
+                  TextField(
+                    
+                    controller: name,
+                    decoration: InputDecoration(
+                      labelText: 'Nhập mã giảm giá: '
+                    ),
+                  ),SizedBox(height: 5,),
                   ElevatedButton(onPressed: (){
-                    final id = DateTime.now().microsecond.toString();
-                    databaseService.createHis(widget.account,id);
+                    for(int i =0; i<diss.length;i++){
+                      if(name.text==diss[i].ma){
+                        print(diss[i].per);
+                        FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
+                      'total': ((gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9])*(100-diss[i].per)/100),
+                    });
+                      }
+                    }
+
+                  }, child: Text('Xac nhan', style: TextStyle(color: Colors.white),),
+                  style:  ButtonStyle(
+                backgroundColor:const MaterialStatePropertyAll(Color(0xff574E6D)),
+                minimumSize: MaterialStatePropertyAll(Size(size.width, size.height/16))
+            ),
+                  ), 
+                  SizedBox(height: 5,),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children:[
+                      ElevatedButton(
+                      
+                      onPressed: (
+                      
+                    ){
+                      setState(() {
+                        
+                      });
+                      // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
+                    },
+                     child: Text('Cập nhật giá : '+(gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9]).toString()+'đ', style: TextStyle(color: Colors.black),),
+                     style:  ButtonStyle(
+                                    // backgroundColor:const MaterialStatePropertyAll(Color(0xff574E6D)),
+                                    // minimumSize: MaterialStatePropertyAll(Size(size.width, size.height/16))
+                                    ),
+                     ),
+                     ElevatedButton(onPressed: (){
+                    id = DateTime.now().microsecond.toString();
                     FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
                       'total': (gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9]),
                     });
+                    databaseService.createHis(widget.account,id);
                     
                     
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>TPPage(account: widget.account,)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>Payment(account: widget.account,)));
                       // databaseReference.remove();
                       
-                  }, child: Text('Xac nhan mua hang')),  
-                  ElevatedButton(onPressed: (
-                    
-                  ){
-                    setState(() {
-                      
-                    });
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
-                  }, child: Text('Cập nhật giá : '+(gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9]).toString()+'đ', style: TextStyle(color: Colors.black),))
+                  }, child: Text('Xac nhan mua hang', style: TextStyle(color: Colors.black),)),
+                    ] 
+                  )
         ]
       ),
   );

@@ -6,6 +6,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:food_market/models/discount.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/page/admin/widget/bottom_option_category.dart';
 import 'package:food_market/page/home/home_page.dart';
@@ -14,6 +15,8 @@ import 'package:food_market/page/home/widgets/navigation_menu.dart';
 
 class SignInContent extends StatefulWidget{
   List<Product> items;
+
+  
    SignInContent({super.key, required this.items});
 
   @override

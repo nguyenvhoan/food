@@ -1,26 +1,33 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:food_market/models/account.dart';
 import 'package:food_market/models/category.dart';
+import 'package:food_market/models/comment.dart';
 import 'package:food_market/models/database_service.dart';
+import 'package:food_market/models/product.dart';
 
 
-class BottomOption extends StatefulWidget {
-  const   BottomOption({super.key});
+class BottomCreateComment extends StatefulWidget {
+     BottomCreateComment({super.key,required this.acc, required this.pro});
+     String acc;
+     Product pro;
 
   @override
-  State<BottomOption> createState() => _BottomOptionState();
+  State<BottomCreateComment> createState() => _StateBottomComment();
 }
 final DatabaseService _databaseService= DatabaseService();
 List<Category> items = []; 
  List<String> list=[];
 TextEditingController nameController= TextEditingController();
-TextEditingController desController=TextEditingController();
-TextEditingController imgController=TextEditingController();
+final databaseReference = FirebaseDatabase.instance.ref('Comment');
 
 
 
+ 
 
-
-class _BottomOptionState extends State<BottomOption> {
+class _StateBottomComment extends State<BottomCreateComment> {
+ 
+ 
   @override
   Widget build(BuildContext context) {
     
@@ -36,32 +43,12 @@ class _BottomOptionState extends State<BottomOption> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(30) ,
                 ),
-                labelText: 'Tên loại :'
+                labelText: 'Hãy nêu cảm nghĩ về sản phẩm :'
               ),
               
             ),
-            SizedBox(height: 5,),
-            TextField(
-                controller: desController,             
-                decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30) ,
-                ),
-                labelText: 'Giới thiệu về loại :'
-              ),
-              
-            ),
-            SizedBox(height: 5,),
-            TextField(
-                controller: imgController,             
-                decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30) ,
-                ),
-                labelText: 'Hình ảnh minh họa :'
-              ),
-              
-            ),
+            
+            
             SizedBox(height: 10,),
             const SizedBox(height: 20,),
            
@@ -71,14 +58,21 @@ class _BottomOptionState extends State<BottomOption> {
               height: 50,
               child: ElevatedButton(
                 onPressed:() {
+                  
                   final id =DateTime.now().microsecond.toString();
-                  final clb = Category(idCate: id, nameCate: nameController.text,descript: desController.text,img: imgController.text);
-                  _databaseService.createCate(clb);
+                  final date =DateTime.now().toString();
+                  // final cmt = CommentABC(id: id, comment: nameController.text, acc: accc);
+                  // _databaseService.createComment(cmt);
+                  databaseReference.child(widget.pro.name + id).set({
+                    'id':id,
+                    'detail':nameController.text,
+                    'acc':widget.acc,
+                    'date':date,
+                    'name':widget.pro.name,
+                    'img':widget.pro.image
+
+                  });
                   nameController.clear();
-                  desController.clear();
-                  imgController.clear();
-                 
-                    
                     Navigator.pop(context);
                 },
               child:const Text('Submit')),

@@ -9,7 +9,8 @@ import 'package:food_market/page/home/profile_page.dart';
 
 
 class NavigationMenu extends StatefulWidget {
-  var account;List<Product> items;
+  var account;
+  List<Product> items;
   
    NavigationMenu({super.key, required this.account, required this.items});
    
@@ -25,7 +26,7 @@ class _NavigationMenuState extends State<NavigationMenu> {
   List<Widget> get page => [
     HomePage(account: account, items: widget.items,),
     Favourite(account: account),
-    Cart(account: account,),
+    Cart(account: account,diss: diss,),
     ProfilePage(acc: account,),
   ] ;
   
