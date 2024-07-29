@@ -13,6 +13,7 @@ class Payment extends StatefulWidget {
 }
 
 class _PaymentState extends State<Payment> {
+  final databaseReference=FirebaseDatabase.instance.ref('Account');
   int type =1;
   void handleRadio(Object? e)=>setState(() {
     type= e as int;
@@ -186,6 +187,19 @@ class _PaymentState extends State<Payment> {
               ),
               ElevatedButton(
             onPressed:() {
+              if(type==1){
+                databaseReference.child(widget.account).set({'PaymentMethod': 'Thanh toán khi nhận hàng'});
+                databaseReference.child(widget.account).set({'Status': 'false'});
+              }
+              else if(type==2){
+                                databaseReference.child(widget.account).set({'PaymentMethod': 'Thanh toán qua momo'});
+                                databaseReference.child(widget.account).set({'Status': 'false'});
+
+              }
+              else{
+                 databaseReference.child(widget.account).set({'PaymentMethod': 'Thanh toán qua bank'});
+                 databaseReference.child(widget.account).set({'Status': 'false'});
+              }
               print('thanhcong');
               Navigator.push(context, 
               MaterialPageRoute(builder: (context)=>  TPPage(account: widget.account,)),

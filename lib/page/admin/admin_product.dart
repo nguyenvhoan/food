@@ -6,6 +6,7 @@ import 'package:food_market/models/database_service.dart';
 import 'package:food_market/models/product.dart';
 import 'package:food_market/page/admin/widget/bottom_sheet_product.dart';
 import 'package:food_market/page/admin/widget/card_product.dart';
+import 'package:food_market/page/home/widgets/nav_bar.dart';
 
 
 // ignore: must_be_immutable
@@ -35,6 +36,7 @@ class _TestState extends State<AdminProduct> {
     });
     // Sử dụng items để xây dựng giao diện
       return Scaffold(
+        drawer: NavBar(),
       
       appBar: AppBar(
         backgroundColor: Color(0xff574E6D),
@@ -124,7 +126,7 @@ class _TestState extends State<AdminProduct> {
                                 child: ListTile(
                                   onTap: () {
                                     Navigator.pop(context);
-                                    databaseReference.child('name ${snapshot.child('nameCLB').value.toString()}')
+                                    databaseReference.child('name '+snapshot.child('name').value.toString())
                                         .remove();
                                   },
                                   leading: const Icon(Icons.delete),
@@ -138,9 +140,7 @@ class _TestState extends State<AdminProduct> {
                     );
       
                   })),
-                  ElevatedButton(onPressed: (){ 
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
-                  }, child: Text('Xếp bảng đấu', style: TextStyle(color: Colors.black),))
+                  
         ]
       ),
 

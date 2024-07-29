@@ -1,8 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:food_market/models/account.dart';
+import 'package:food_market/page/home/intro_page.dart';
 
 class ProfilePage extends StatefulWidget {
    ProfilePage({super.key, required this.acc});
@@ -22,6 +24,15 @@ class _ProfilePageState extends State<ProfilePage> {
    
     loadAccountData();
   }
+  Future<void> signOut() async {
+  try {
+    await FirebaseAuth.instance.signOut();
+    // Xóa các thông tin đăng nhập lưu trữ (nếu có)
+    // ...
+  } catch (e) {
+    print('Lỗi đăng xuất: $e');
+  }
+}
 
   void loadAccountData() {
     databaseReference.onValue.listen((DatabaseEvent event) {
@@ -147,9 +158,14 @@ class _ProfilePageState extends State<ProfilePage> {
                     
                       children:[
                         SizedBox(width: 15,),
-                      Image.asset('asset/images/icons/icon_logout.png'),
+                      GestureDetector(
+                        onTap: (){
+                          signOut();
+                          Navigator.push(context, MaterialPageRoute(builder: (context)=>IntroPage()));
+                        },
+                        child: Image.asset('asset/images/icons/icon_logout.png')),
                       Text('Log-Out', style: TextStyle(fontSize: 20),)
-
+                        
                       
                     ] ),SizedBox(height: 30,)
                   ],

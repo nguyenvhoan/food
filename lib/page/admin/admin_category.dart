@@ -7,6 +7,7 @@ import 'package:food_market/models/category.dart';
 import 'package:food_market/models/database_service.dart';
 import 'package:food_market/page/admin/widget/bottom_option_category.dart';
 import 'package:food_market/page/admin/widget/update_bottom_sheet.dart';
+import 'package:food_market/page/home/widgets/nav_bar.dart';
 
 
 
@@ -37,8 +38,10 @@ class _AdminCateState extends State<AdminCate> {
   Widget build(BuildContext context) {
     // Sử dụng items để xây dựng giao diện
     return Scaffold(
+      drawer: NavBar(),
       
       appBar: AppBar(
+
         backgroundColor: Color(0xff574E6D),
         centerTitle: true,
         title:const Text('Những loại sản phẩm', style: TextStyle(
@@ -125,7 +128,7 @@ class _AdminCateState extends State<AdminCate> {
                                 child: ListTile(
                                   onTap: () {
                                     Navigator.pop(context);
-                                    databaseReference.child('name ${snapshot.child('nameCLB').value.toString()}')
+                                    databaseReference.child('name '+ snapshot.child('nameCate').value.toString())
                                         .remove();
                                   },
                                   leading: const Icon(Icons.delete),
@@ -139,9 +142,7 @@ class _AdminCateState extends State<AdminCate> {
                     );
       
                   })),
-                  ElevatedButton(onPressed: (){
-                    // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
-                  }, child: Text('Xếp bảng đấu', style: TextStyle(color: Colors.black),))
+                  
         ]
       ),
 

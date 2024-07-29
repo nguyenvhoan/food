@@ -129,32 +129,14 @@ class _ConfirmPageState extends State<ConfirmPage> {
                       labelText: 'Nhập mã giảm giá: '
                     ),
                   ),SizedBox(height: 5,),
-                  ElevatedButton(onPressed: (){
-                    for(int i =0; i<diss.length;i++){
-                      if(name.text==diss[i].ma){
-                        print(diss[i].per);
-                        FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
-                      'total': ((gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9])*(100-diss[i].per)/100),
-                    });
-                      }
-                    }
-
-                  }, child: Text('Xac nhan', style: TextStyle(color: Colors.white),),
-                  style:  ButtonStyle(
-                backgroundColor:const MaterialStatePropertyAll(Color(0xff574E6D)),
-                minimumSize: MaterialStatePropertyAll(Size(size.width, size.height/16))
-            ),
-                  ), 
+                   
                   SizedBox(height: 5,),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children:[
-                      ElevatedButton(
-                      
-                      onPressed: (
-                      
+                      ElevatedButton( 
+                      onPressed: (          
                     ){
-                      setState(() {
-                        
+                      setState(() {   
                       });
                       // Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateBattle()));
                     },
@@ -166,9 +148,23 @@ class _ConfirmPageState extends State<ConfirmPage> {
                      ),
                      ElevatedButton(onPressed: (){
                     id = DateTime.now().microsecond.toString();
-                    FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
+                   for(int i =0; i<diss.length;i++){
+                      if(name.text==diss[i].ma){
+                        print(diss[i].per);
+                        FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
+                      'total': ((gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9])*(100-diss[i].per)/100),
+                      
+                    }
+                    );
+                    print('Su dung ma giam gia thanh cong');
+                      }
+                      else {
+                        FirebaseDatabase.instance.ref('Account').child(widget.account).child('History').child('HistoryCart').child(id).set({
                       'total': (gia[0]+gia[1]+gia[2]+gia[3]+gia[4]+gia[5]+gia[6]+gia[7]+gia[8]+gia[9]),
                     });
+                      }
+                    }
+                    
                     databaseService.createHis(widget.account,id);
                     
                     

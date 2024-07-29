@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:food_market/models/discount.dart';
 import 'package:food_market/models/product.dart';
+import 'package:food_market/page/admin/admin_category.dart';
 import 'package:food_market/page/admin/widget/bottom_option_category.dart';
 import 'package:food_market/page/home/home_page.dart';
 import 'package:food_market/page/home/register_page.dart';
@@ -34,6 +35,9 @@ class _SignInContentState extends State<SignInContent> {
       try{
          String userId = FirebaseAuth.instance.currentUser?.uid ?? '';
       print('User ID: $userId');
+      if(email=='admin@gmail.com'&&password=='123'){
+        Navigator.push(context, MaterialPageRoute(builder: (context)=>AdminCate()));
+      }
         await FirebaseAuth.instance.signInWithEmailAndPassword(email: email, password: password);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content:Text( 'Đăng nhập thành công',
           textAlign: TextAlign.center,
